@@ -3,10 +3,10 @@
 // Can be controlled using a serial terminal (e.g. TeraTerm) but it is intended for use with one of these:
 //  - Android HABExplora app (for phones)
 //  - Android HABPADD app (for tablets)
-//  - LoRa Serial Gateway (for Windows)
+//  - HAB Base (for Windows)
 
 #define DEVICE "LoRaGo USB OTG Receiver"
-#define VERSION "2.0"
+#define VERSION "2.02"
 
 // PIN ALLOCATIONS
 
@@ -351,7 +351,7 @@ void SetFrequency(char *Line)
 
   Freq = atof(Line);
 
-  if (Frequency > 0)
+  if (Freq > 0)
   {
     ReplyOK();
 
@@ -695,6 +695,7 @@ void CheckRx()
   if (digitalRead(dio0))
   {
     unsigned char Message[256];
+    int8_t RawSNR;
     int Bytes, SNR, RSSI, i;
     long Altitude;
 
@@ -705,9 +706,10 @@ void CheckRx()
     
     Serial.print("FreqErr="); Serial.println(FrequencyError()/1000.0);
 
-    SNR = readRegister(REG_PACKET_SNR);
-    SNR /= 4;
-    
+    RawSNR = readRegister(REG_PACKET_SNR);
+    RawSNR /= 4;
+    SNR = RawSNR;
+       
     if (Frequency > 525)
     {
       RSSI = readRegister(REG_PACKET_RSSI) - 157;
